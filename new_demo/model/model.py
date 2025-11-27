@@ -15,7 +15,6 @@ See https://truss.baseten.co/quickstart for more.
 from huggingface_hub import login
 from transformers import pipeline
 
-
 class Model:
     def __init__(self, **kwargs):
         # Uncomment the following to get access
@@ -25,12 +24,10 @@ class Model:
         # self._config = kwargs["config"]
         self._secrets = kwargs["secrets"]
         login(token=self._secrets["hf_access_token"])
-        self._messages = [
-            {
+        self.system_prompt = {
                 "role": "system",
                 "content": "You are an enthusiastic and helpful assistant. You are an elite and experienced recruiter and hiring manager in tech and help candidates land better roles and evaluate their fit with the job description.",
             }
-        ]
         self._model = None
 
     def load(self):
@@ -38,9 +35,13 @@ class Model:
         self._model = pipeline(
             "text-generation",
             model="meta-llama/Llama-3.2-1B-Instruct",
+            batch_size = 3
         )
+        self._model.tokenizer.pad_token_id = self._model.model.config.eos_token_id[0]
 
-    def predict(self, model_input):
+    def predict(self, requests):
         # Run model inference here
-        self._messages.append({"role": "user", "content": model_input["instruction"]})
-        return self._model(self._messages)
+        # for request in requests:
+        #     self._messages.append(request)
+        x = [[self.system_prompt] + [req] for req in requests]
+        return self._model(x)
