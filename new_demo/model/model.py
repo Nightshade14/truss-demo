@@ -12,8 +12,8 @@ The main methods to implement here are:
 See https://truss.baseten.co/quickstart for more.
 """
 
+from huggingface_hub import login
 from transformers import pipeline
-
 
 
 class Model:
@@ -24,24 +24,23 @@ class Model:
         # self._data_dir = kwargs["data_dir"]
         # self._config = kwargs["config"]
         self._secrets = kwargs["secrets"]
+        login(token=self._secrets["hf_access_token"])
         self._messages = [
             {
-                "role": "user", 
-                "content": "You are an enthusiastic and helpful assistant. You are an elite and experienced recruiter and hiring manager in tech and help coach candidates land better roles and evaluate their fit with the job description."
+                "role": "system",
+                "content": "You are an enthusiastic and helpful assistant. You are an elite and experienced recruiter and hiring manager in tech and help candidates land better roles and evaluate their fit with the job description.",
             }
         ]
         self._model = None
 
     def load(self):
         # Load model here and assign to self._model.
-        self._model = pipeline("text-generation", model="meta-llama/Llama-3.2-1B-Instruct",use_auth_token=self._secrets["hf_access_token"])
+        self._model = pipeline(
+            "text-generation",
+            model="meta-llama/Llama-3.2-1B-Instruct",
+        )
 
     def predict(self, model_input):
         # Run model inference here
-        model_input.append(
-            {
-                "role": "user",
-                "content": model_input
-            }
-        )
-        return self._model(model_input)
+        self._messages.append({"role": "user", "content": model_input["instruction"]})
+        return self._model(self._messages)
