@@ -1,0 +1,12 @@
+requirements:
+    - torch
+    - transformers
+secrets:
+    hf_access_token: null
+model_name: chat_v1
+python_version: py312
+resources:
+    accelerator: T4
+    cpu: "4"
+    memory: 16Gi
+    use_gpu: true
