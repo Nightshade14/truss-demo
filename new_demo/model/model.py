@@ -14,7 +14,6 @@ See https://truss.baseten.co/quickstart for more.
 
 from huggingface_hub import login
 from transformers import pipeline
-import json
 
 
 class Model:
