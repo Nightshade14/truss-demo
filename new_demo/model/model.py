@@ -14,6 +14,8 @@ See https://truss.baseten.co/quickstart for more.
 
 from huggingface_hub import login
 from transformers import pipeline
+import json
+
 
 class Model:
     def __init__(self, **kwargs):
@@ -25,23 +27,20 @@ class Model:
         self._secrets = kwargs["secrets"]
         login(token=self._secrets["hf_access_token"])
         self.system_prompt = {
-                "role": "system",
-                "content": "You are an enthusiastic and helpful assistant. You are an elite and experienced recruiter and hiring manager in tech and help candidates land better roles and evaluate their fit with the job description.",
-            }
+            "role": "system",
+            "content": "You are an enthusiastic and helpful assistant. You are an elite and experienced recruiter and hiring manager in tech and help candidates land better roles and evaluate their fit with the job description.",
+        }
         self._model = None
 
     def load(self):
         # Load model here and assign to self._model.
         self._model = pipeline(
-            "text-generation",
-            model="meta-llama/Llama-3.2-1B-Instruct",
-            batch_size = 3
+            "text-generation", model="meta-llama/Llama-3.2-1B-Instruct", batch_size=3
         )
         self._model.tokenizer.pad_token_id = self._model.model.config.eos_token_id[0]
+        self._model.tokenizer.padding_side = "left"
 
-    def predict(self, requests):
+    def predict(self, request):
         # Run model inference here
-        # for request in requests:
-        #     self._messages.append(request)
-        x = [[self.system_prompt] + [req] for req in requests]
+        x = [self.system_prompt] + request["conversation_history"]
         return self._model(x)
