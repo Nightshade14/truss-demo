@@ -49,7 +49,7 @@ MODEL_API_ENDPOINT=https://model-xxxx.api.baseten.co/production/predict
 ASYNC_MODEL_API_ENDPOINT=https://model-xxxx.api.baseten.co/production/async_predict
 ```
 
-## 🧪 Local Development (exp.py)
+## 🧪 Local Development (`exp.py`)
 Before deploying to the cloud, verify that the model loads and tokenizes correctly on your local machine.
 
 ```bash
